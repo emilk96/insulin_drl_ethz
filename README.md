@@ -10,3 +10,4 @@
 * To run soft actor critic training script (from inside the container) ``python3 sac/sac.py``, runtime approx. 3hrs on NVDIA Titan X. 
 * Run inference in a validation environment use ``python3 sac/sac_inference.py``.
 
+Emil Krauch 2021, ekrauch@ethz.ch
