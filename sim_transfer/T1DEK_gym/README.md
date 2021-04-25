@@ -1,0 +1,1 @@
+Readme from Emil's custom gym environment
