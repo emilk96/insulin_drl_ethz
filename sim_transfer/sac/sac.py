@@ -1,7 +1,3 @@
-# pip3 install tf-agents[reverb]
-# pip3 install pybullet
-# Necessary to cite tf-agents, tf, reverb in thesis 
-
 #Imports
 from T1DEKTF import T1DEKTF
 
