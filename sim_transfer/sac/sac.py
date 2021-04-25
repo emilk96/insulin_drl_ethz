@@ -306,12 +306,3 @@ if __name__ == "__main__":
 
     rb_observer.close()
     reverb_server.stop()
-
-
-def reward(BG_last_hour):
-    b = BG_last_hour[-1]
-    c0 = 3.35506
-    c1 = 0.8353
-    c2 = 3.7932
-    risk = 10 * (c0 * (np.log(b)**c1 - c2))**2
-    return -risk  
