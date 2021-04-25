@@ -1,12 +1,12 @@
-# Tensorflow 2.0 GPU Docker
+# ETHZ/pdz DRL system for T1D blood glucose control
 
-Simulator environment
-
-## Build instructions
+## Quick start guide
+* The system is optimized for a GPU (NVIDIA) enabled machine. 
 * To build the image use ``build.sh``
-* Move necessary files to tf20_transfer directory, it will be mounted to the container. 
-* Change the absolute path of tf2_transfer in run.sh to make it possible to mount. This can only be done by putting in the absolute path of directory in host machine after the -v command.
+* Move necessary files to sim_transfer directory, it will be mounted to the container. 
+* Change the absolute path of sim_transfer in run.sh to make it possible to mount. This can only be done by putting in the absolute path of directory in host machine after the -v command.
 * To run the container use ``run.sh``
-* To open jupyter notebook use ``j.sh`` (from outside container) or ``bash ji.sh`` (from inside container, the script is in the /homedirectory folder which is default folder)
-
+* To run simglucose (T1D UVA/Padova python implementation) use ``run_simglucose.sh`` from a seperate terminal. 
+* To run soft actor critic training script (from inside the container) ``python3 sac/sac.py``, run time approx. 3hrs on NVDIA Titan X. 
+* Run inference in a validation environment use ``python3 sac/sac_inference.py``.
 
