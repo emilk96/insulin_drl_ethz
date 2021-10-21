@@ -13,12 +13,13 @@ from gym.utils import seeding
 from datetime import datetime
 import matplotlib.pyplot as plt
 
+#Parameters of patients blood glucose dynamics
 PATIENT_PARA_FILE = pkg_resources.resource_filename(
     'simglucose', 'params/vpatient_params.csv')
 
-
 class T1DEK(gym.Env):
-  """Custom Environment that follows gym interface"""
+  """Custom Environment that follows gym interface
+  """
   metadata = {'render.modes': ['rgb']}
 
   SENSOR_HARDWARE = 'Dexcom'
