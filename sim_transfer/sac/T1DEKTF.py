@@ -31,8 +31,6 @@ PATIENT_PARA_FILE = pkg_resources.resource_filename(
     'simglucose', 'params/vpatient_params.csv')
 
 
-
-
 ##---------------------######################
 # Type 1 Diabetes Environment 
 
@@ -46,9 +44,6 @@ class T1DEKTF(py_environment.PyEnvironment):
     
 
     def __init__(self, patient_name=None, reward_function=None, seed=None):
-        """
-            New simulator instance, reset simulator
-        """
         
         state_length = 120 #in minutes, passed to rnn
         
@@ -107,7 +102,7 @@ class T1DEKTF(py_environment.PyEnvironment):
 
     def seed(self, seed=None):
         """
-            Seed function for new simulator
+            Seed function for simulator
         """
         
         self.np_random, seed1 = seeding.np_random(seed=seed)
@@ -116,7 +111,7 @@ class T1DEKTF(py_environment.PyEnvironment):
 
     def create_simulator_from_random_state(self):
         """
-            Seed function for new simulator
+            Create new simulator instance 
         """ 
         
         seed2 = seeding.hash_seed(self.np_random.randint(0, 1000)) % 2**31
@@ -132,22 +127,24 @@ class T1DEKTF(py_environment.PyEnvironment):
         sensor = CGMSensor.withName(self.SENSOR_HARDWARE, seed=seed2)
 
         scenario = RandomScenario(start_time=start_time, seed=seed3)
-        ## This does not work yet, only with the function RandomScenario sadly
-        #scen = [(7, 45), (12, 70), (16, 15), (18, 80)]
-        #scenario = CustomScenario(start_time=start_time, scenario=scen)
 
         pump = InsulinPump.withName(self.INSULIN_PUMP_HARDWARE)
         simulator = _T1DSimEnv(patient, sensor, pump, scenario)
         return simulator, seed2, seed3, seed4
 
     def _reset(self):
+        """
+            Reset simulator to defaults
+        """
         self.simulator, _, _, _ = self.create_simulator_from_random_state()
         obs, _, _, _ = self.simulator.reset()
         obs = obs[0]
         self._episode_ended = False
-        self._state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, obs]
-        #self._state = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[obs,0]]
-        self._state = np.asarray(self._state).reshape(self._observation_spec.shape)
+        
+        self._state =  [0] * state_length
+        self._state = np.delete(self._state, 0, axis=0)
+        self._state = np.insert(self._state, self._observation_spec.shape[0]-1, obs, axis=0)
+        self._state = np.reshape(self._state, self._observation_spec.shape)
         return ts.restart(np.array(self._state, dtype=np.float32))
 
     def render(self, filename="test.png"):
