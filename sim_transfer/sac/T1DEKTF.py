@@ -148,6 +148,9 @@ class T1DEKTF(py_environment.PyEnvironment):
         return ts.restart(np.array(self._state, dtype=np.float32))
 
     def render(self, filename="test.png"):
+        """
+            Render the episode to png
+        """
         normal_bg, low_bg, high_bg = self.simulator.render(close=False)
         plt = self.simulator.viewer.fig
         plt.savefig(filename)
