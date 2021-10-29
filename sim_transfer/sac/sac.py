@@ -41,8 +41,11 @@ from tf_agents.utils import common
 #Folder to save training logs, policies, models, etc. 
 tempdir = "st_results/child7/child7_results"
 
-#Reward function for model: Fermi Risk function
 def reward(BG_last_hour):
+    
+    """
+        Reward function for model: Risk function based on Fermi Risk Function
+    """
     b = BG_last_hour[-1]
     if 20 <= b < 65:
         return 30-(80-65)*3-(65-b)*10
@@ -59,7 +62,7 @@ def reward(BG_last_hour):
     #Info: A termination penalty -1e6 is added if the system stops due to hypoglycemia
 
 if __name__ == "__main__":
-    ##############   HYPERPARAMETERS   ############### Todo: Make parameters file 
+    ##############   HYPERPARAMETERS   ###############
     num_iterations = 1000000 # @param {type:"integer"}
 
     initial_collect_steps = 1000 # @param {type:"integer"}
@@ -94,15 +97,15 @@ if __name__ == "__main__":
     #Load Environment
     collect_env = T1DEKTF(reward_function=reward)
     eval_env = T1DEKTF(reward_function=reward)
-    #utils.validate_py_environment(env, episodes=5)
-
     use_gpu = True
     strategy = strategy_utils.get_strategy(tpu=False, use_gpu=use_gpu)
 
 
-    #Define Actor, Critic, SAC
+    #Get the environment specs from tf-environment
     observation_spec, action_spec, time_step_spec = (spec_utils.get_tensor_specs(collect_env))
 
+    
+    #Define Critic
     with strategy.scope():
         critic_net = critic_rnn_network.CriticRnnNetwork(
         (observation_spec, action_spec), 
@@ -119,6 +122,7 @@ if __name__ == "__main__":
         rnn_construction_kwargs=None, 
         name='CriticRnnNetwork')
 
+    #Define Actor
     with strategy.scope():
         actor_net = actor_distribution_rnn_network.ActorDistributionRnnNetwork( 
         observation_spec,
@@ -138,6 +142,7 @@ if __name__ == "__main__":
         rnn_construction_kwargs=None, 
         name='ActorDistributionRnnNetwork')
 
+    #Define SAC Agent
     with strategy.scope():
         train_step = train_utils.create_train_step()
 
@@ -160,9 +165,6 @@ if __name__ == "__main__":
 
 
     #Experience replay with reverb (Deepmind)
-    #Rate limiter
-    #rate_limiter=reverb.rate_limiters.SampleToInsertRatio(samples_per_insert=300.0, min_size_to_sample=3, error_buffer=600.0) #Changed from 3,3 
-
     table_name = 'Emils_table'
     table = reverb.Table(
         table_name,
